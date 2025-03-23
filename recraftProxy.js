@@ -7,6 +7,8 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3003;
 
+app.set("trust proxy", true);
+
 // Explicit CORS for all Figma subdomains
 app.use(
   cors({
