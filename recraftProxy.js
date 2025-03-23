@@ -10,13 +10,34 @@ const PORT = process.env.PORT || 3003;
 app.set("trust proxy", true);
 
 // Explicit CORS for all Figma subdomains
-app.use(
-  cors({
-    origin: [/^https:\/\/([a-zA-Z0-9-]+\.)*figma\.com$/],
-    methods: ["POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// app.use(
+//   cors({
+//     origin: [/^https:\/\/([a-zA-Z0-9-]+\.)*figma\.com$/],
+//     methods: ["POST", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//   })
+// );
+
+app.use((req, res, next) => {
+  const allowedOrigins = [/^https:\/\/([a-zA-Z0-9-]+\.)*figma\.com$/];
+  const origin = req.headers.origin;
+
+  if (origin && allowedOrigins.some((pattern) => pattern.test(origin))) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
+  }
+
+  // Handle preflight OPTIONS request explicitly
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 
 // Parse JSON bodies
 app.use(express.json());
