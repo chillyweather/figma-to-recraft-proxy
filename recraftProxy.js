@@ -5,7 +5,7 @@ require('dotenv').config();
 
 // Initialize Express
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3003;
 
 // Enable CORS for Figma domains
 app.use(cors({
