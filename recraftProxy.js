@@ -42,9 +42,17 @@ app.use((req, res, next) => {
 // Parse JSON bodies
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log("Headers:", req.headers);
+  next();
+});
+
 // Health check endpoint
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
+  console.log("[Health Check] Received request from:", req.headers.origin);
+  console.log("[Health Check] Request headers:", req.headers);
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 // Proxy endpoint for Recraft API
