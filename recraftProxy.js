@@ -25,6 +25,8 @@ app.use((req, res, next) => {
   ];
   const origin = req.headers.origin;
 
+  console.log("CORS request from origin:", origin);
+
   if (origin && allowedOrigins.some((pattern) => pattern.test(origin))) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
