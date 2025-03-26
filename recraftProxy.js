@@ -19,7 +19,10 @@ app.set("trust proxy", true);
 // );
 
 app.use((req, res, next) => {
-  const allowedOrigins = [/^https:\/\/([a-zA-Z0-9-]+\.)*figma\.com$/];
+  const allowedOrigins = [
+    /^https:\/\/([a-zA-Z0-9-]+\.)*figma\.com$/,
+    "http://localhost:3000",
+  ];
   const origin = req.headers.origin;
 
   if (origin && allowedOrigins.some((pattern) => pattern.test(origin))) {
