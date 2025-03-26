@@ -21,7 +21,7 @@ app.set("trust proxy", true);
 app.use((req, res, next) => {
   const allowedOrigins = [
     new RegExp("^https://([a-zA-Z0-9-]+\\.)*figma\\.com$"),
-    new RegExp("^http://localhost:3000$"),
+    new RegExp("http://localhost:4169$"),
   ];
   const origin = req.headers.origin;
 
