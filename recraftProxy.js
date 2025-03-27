@@ -1,10 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
+const multer = require("multer");
+const FormData = require("form-data");
+const fs = require("fs");
 require("dotenv").config();
 
-// Initialize Express
+// Initialize Express and multer
 const app = express();
+const upload = multer({ dest: "uploads/" });
 const PORT = process.env.PORT || 3003;
 
 app.set("trust proxy", true);
@@ -91,6 +95,53 @@ app.post("/recraft/generate", async (req, res) => {
 
     return res.status(200).json(response.data);
   } catch (error) {
+    console.error(
+      "Error calling Recraft API:",
+      error.response ? error.response.data : error.message
+    );
+    return res.status(error.response ? error.response.status : 500).json({
+      error: error.response ? error.response.data : error.message,
+    });
+  }
+});
+
+// Add new endpoint for style creation
+app.post("/recraft/styles", upload.single("file"), async (req, res) => {
+  try {
+    console.log("Received request for style creation:", req.body);
+
+    const recraftApiKey = process.env.RECRAFT_API_KEY;
+    if (!recraftApiKey) {
+      return res
+        .status(500)
+        .json({ error: "API key not configured on server" });
+    }
+
+    const formData = new FormData();
+    formData.append("style", req.body.style);
+    formData.append("file", fs.createReadStream(req.file.path));
+
+    const response = await axios({
+      method: "POST",
+      url: "https://external.api.recraft.ai/v1/styles",
+      headers: {
+        ...formData.getHeaders(),
+        Authorization: `Bearer ${recraftApiKey}`,
+      },
+      data: formData,
+    });
+
+    // Clean up uploaded file
+    fs.unlinkSync(req.file.path);
+
+    console.log("Successful response from Recraft API:", response.data);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    // Clean up uploaded file in case of error
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+
     console.error(
       "Error calling Recraft API:",
       error.response ? error.response.data : error.message
